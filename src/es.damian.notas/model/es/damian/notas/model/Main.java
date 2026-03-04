@@ -1,10 +1,9 @@
-package es.damian.notas;
+package es.damian.notas.model;
 
-import es.damian.notas.model.Usuario;
-import es.damian.notas.repository.FileRepository;
-import es.damian.notas.service.AuthService;
-import es.damian.notas.service.NoteService;
 import java.util.Scanner;
+import repository.AuthService;
+import repository.FileRepository;
+import repository.NoteService;
 
 public class Main {
     private static Scanner scanner = new Scanner(System.in);
@@ -16,20 +15,20 @@ public class Main {
         while (opcion != 0) {
             System.out.println("\n=== SISTEMA DE NOTAS ===");
             System.out.println("1. Registrarse");
-            System.out.println("2. Iniciar sesión");
+            System.out.println("2. Iniciar sesion");
             System.out.println("0. Salir");
-            System.out.print("Seleccione una opción: ");
+            System.out.print("Seleccione una opcion: ");
 
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
                 switch (opcion) {
                     case 1 -> registrarUsuario();
                     case 2 -> loginUsuario();
-                    case 0 -> System.out.println("¡Hasta pronto!");
-                    default -> System.out.println("⚠️ Opción no válida.");
+                    case 0 -> System.out.println("Hasta pronto");
+                    default -> System.out.println("Error: Opcion no valida.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("⚠️ Error: Introduce un número válido.");
+                System.out.println("Error: Introduce un numero valido.");
             }
         }
     }
@@ -37,7 +36,7 @@ public class Main {
     private static void registrarUsuario() {
         System.out.print("Email: ");
         String email = scanner.nextLine();
-        System.out.print("Contraseña: ");
+        System.out.print("Contrasena: ");
         String pass = scanner.nextLine();
         authService.registrar(email, pass);
     }
@@ -45,7 +44,7 @@ public class Main {
     private static void loginUsuario() {
         System.out.print("Email: ");
         String email = scanner.nextLine();
-        System.out.print("Contraseña: ");
+        System.out.print("Contrasena: ");
         String pass = scanner.nextLine();
 
         Usuario usuario = authService.login(email, pass);
@@ -59,19 +58,19 @@ public class Main {
     private static void menuUsuario(NoteService noteService) {
         int opcion = -1;
         while (opcion != 0) {
-            System.out.println("\n--- MENÚ DE NOTAS ---");
+            System.out.println("\n--- MENU DE NOTAS ---");
             System.out.println("1. Crear nota");
             System.out.println("2. Listar notas");
-            System.out.println("3. Ver nota por número");
+            System.out.println("3. Ver nota por numero");
             System.out.println("4. Eliminar nota");
-            System.out.println("0. Cerrar sesión");
-            System.out.print("Seleccione una opción: ");
+            System.out.println("0. Cerrar sesion");
+            System.out.print("Seleccione una opcion: ");
 
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
                 switch (opcion) {
                     case 1 -> {
-                        System.out.print("Título: ");
+                        System.out.print("Titulo: ");
                         String titulo = scanner.nextLine();
                         System.out.print("Contenido: ");
                         String contenido = scanner.nextLine();
@@ -79,19 +78,19 @@ public class Main {
                     }
                     case 2 -> noteService.listarNotas();
                     case 3 -> {
-                        System.out.print("Número de nota: ");
+                        System.out.print("Numero de nota: ");
                         int num = Integer.parseInt(scanner.nextLine());
                         noteService.verNota(num - 1);
                     }
                     case 4 -> {
-                        System.out.print("Número de nota a eliminar: ");
+                        System.out.print("Numero de nota a eliminar: ");
                         int numDel = Integer.parseInt(scanner.nextLine());
                         noteService.eliminarNota(numDel - 1);
                     }
-                    case 0 -> System.out.println("Cerrando sesión...");
+                    case 0 -> System.out.println("Cerrando sesion...");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("⚠️ Error: Introduce un número válido.");
+                System.out.println("Error: Introduce un numero valido.");
             }
         }
     }

@@ -1,7 +1,5 @@
-package es.damian.notas.service;
+package repository;
 
-import es.damian.notas.model.Nota;
-import es.damian.notas.repository.FileRepository;
 import java.io.IOException;
 import java.util.List;
 
@@ -29,7 +27,7 @@ public class NoteService {
         try {
             List<Nota> notas = repository.leerNotas(emailSanitizado);
             if (notas.isEmpty()) {
-                System.out.println("📭 No tienes notas guardadas.");
+                System.out.println("No tienes notas guardadas.");
                 return;
             }
             System.out.println("\n--- TUS NOTAS ---");
@@ -37,7 +35,7 @@ public class NoteService {
                 System.out.println((i + 1) + ". " + notas.get(i).getTitulo());
             }
         } catch (IOException e) {
-            System.err.println("❌ Error al leer las notas: " + e.getMessage());
+            System.err.println("Error al leer las notas: " + e.getMessage());
         }
     }
 
@@ -47,7 +45,7 @@ public class NoteService {
             if (indice >= 0 && indice < notas.size()) {
                 System.out.println(notas.get(indice).toString());
             } else {
-                System.out.println("Número de nota no válido.");
+                System.out.println("Numero de nota no valido.");
             }
         } catch (IOException e) {
             System.err.println("Error al acceder a la nota: " + e.getMessage());
@@ -56,4 +54,16 @@ public class NoteService {
 
     public void eliminarNota(int indice) {
         try {
-            List<Nota> notas = repository.leerNotas(
+            List<Nota> notas = repository.leerNotas(emailSanitizado);
+            if (indice >= 0 && indice < notas.size()) {
+                Nota eliminada = notas.remove(indice);
+                repository.guardarNotas(emailSanitizado, notas);
+                System.out.println("Nota '" + eliminada.getTitulo() + "' eliminada correctamente.");
+            } else {
+                System.out.println("Error: El numero de nota no existe.");
+            }
+        } catch (IOException e) {
+            System.err.println("Error al eliminar la nota: " + e.getMessage());
+        }
+    }
+}
