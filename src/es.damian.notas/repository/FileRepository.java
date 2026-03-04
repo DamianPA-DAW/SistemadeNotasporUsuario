@@ -1,41 +1,40 @@
-package es.damian.notas.model;
+package repository;
 
-import es.damian.notas.model.Note;
-import es.damian.notas.repository.Repository;
-
-import java.io.File;
+import es.damian.notas.model.Usuario;
 import java.io.IOException;
-import java.nio.files.*;
+import java.nio.file.*; 
 import java.util.ArrayList;
 import java.util.List;
 
-    public class FileRepository {
-        private static final Path DATA_DIR = Paths.get("data");
-        private static final Path USERS_FILE = DATA_DIR.resolve("users.txt");
-        private static final Path USUARIOS_DIR = DATA_DIR.resolve("usuarios");
-    
-        public FileRepository(){
-            try{
-              if (Files.notExists(DATA_DIR)) Files.createDirectory(DATA_DIR);
-            if (Files.notExists(USUARIOS_DIR)) Files.createDirectory(USUARIOS_DIR);
-            if (Files.notExists(USERS_FILE)) Files.createFile(USERS_FILE);
-            } catch (IOException e) {
-                System.err.println("Error inicializando el archivo de usuarios: " + e.getMessage());
-            }
-        }
+public class FileRepository {
+    private static final Path DATA_DIR = Paths.get("data");
+    private static final Path USERS_FILE = DATA_DIR.resolve("users.txt");
+    private static final Path USUARIOS_DIR = DATA_DIR.resolve("usuarios");
 
-        public void guardarUsuario(Usuario usuario) throws IOException {
-            String linea = usuario.getNombre() + "," + usuario.getEmail() + "," + usuario.getPassword() + "\n";
-            Files.write(USERS_FILE, linea.getBytes(), StandardOpenOption.APPEND);
+    public FileRepository() {
+        try {
+            if (Files.notExists(DATA_DIR)) Files.createDirectories(DATA_DIR);
+            if (Files.notExists(USUARIOS_DIR)) Files.createDirectories(USUARIOS_DIR);
+            if (Files.notExists(USERS_FILE)) Files.createFile(USERS_FILE);
+        } catch (IOException e) {
+            System.err.println("Error inicializando el sistema de archivos: " + e.getMessage());
         }
-    
-        public List<Usuario> leerTodosLosUsuarios() throws IOException {
+    }
+
+    public void guardarUsuario(Usuario usuario) throws IOException {
+        String linea = usuario.getEmail() + ";" + usuario.getPassword() + System.lineSeparator();
+        Files.write(USERS_FILE, linea.getBytes(), StandardOpenOption.APPEND);
+    }
+
+    public List<Usuario> leerTodosLosUsuarios() throws IOException {
         List<Usuario> usuarios = new ArrayList<>();
-        List<String> lineas = Files.readAllLines(USERS_FILE);
-        for (String linea : lineas) {
-            String[] partes = linea.split(";");
-            if (partes.length == 2) {
-                usuarios.add(new Usuario(partes[0], partes[1]));
+        if (Files.exists(USERS_FILE)) {
+            List<String> lineas = Files.readAllLines(USERS_FILE);
+            for (String linea : lineas) {
+                String[] partes = linea.split(";");
+                if (partes.length == 2) {
+                    usuarios.add(new Usuario(partes[0], partes[1]));
+                }
             }
         }
         return usuarios;
@@ -44,17 +43,19 @@ import java.util.List;
     public void crearCarpetaUsuario(String emailSanitizado) throws IOException {
         Path rutaUsuario = USUARIOS_DIR.resolve(emailSanitizado);
         if (Files.notExists(rutaUsuario)) {
-            Files.createDirectory(rutaUsuario);
+            Files.createDirectories(rutaUsuario);
         }
     }
 
     public void guardarNotas(String emailSanitizado, List<Nota> notas) throws IOException {
-        Path archivoNotas = USUARIOS_DIR.resolve(emailSanitizado).resolve("notas.txt");
+        Path carpetaUsuario = USUARIOS_DIR.resolve(emailSanitizado);
+        if (Files.notExists(carpetaUsuario)) crearCarpetaUsuario(emailSanitizado);
+        
+        Path archivoNotas = carpetaUsuario.resolve("notas.txt");
         List<String> lineas = new ArrayList<>();
         for (Nota n : notas) {
             lineas.add(n.getTitulo() + ";" + n.getContenido());
         }
-        // Files.write con StandardOpenOption.TRUNCATE_EXISTING sobrescribe el archivo con la lista actualizada
         Files.write(archivoNotas, lineas, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
@@ -65,7 +66,7 @@ import java.util.List;
         if (Files.exists(archivoNotas)) {
             List<String> lineas = Files.readAllLines(archivoNotas);
             for (String linea : lineas) {
-                String[] partes = linea.split(";", 2); // Separamos solo por el primer ';'
+                String[] partes = linea.split(";", 2);
                 if (partes.length == 2) {
                     notas.add(new Nota(partes[0], partes[1]));
                 }
