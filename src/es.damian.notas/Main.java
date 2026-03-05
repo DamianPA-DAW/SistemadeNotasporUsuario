@@ -1,5 +1,6 @@
-package es.damian.notas.model;
 
+
+import es.damian.notas.model.Usuario;
 import java.util.Scanner;
 import repository.AuthService;
 import repository.FileRepository;
